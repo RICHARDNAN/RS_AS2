@@ -39,22 +39,31 @@ It is normal to write the abstract last.  First, try to concisely state the prob
 
 
 \section{Introduction}
-Use the introduction to explain your project (problem/question/challenge) to the reader.  To do this well, you will need to provide some background context.  It can be useful to imagine you are writing for someone who would be able to understand your work, but who is not familiar with it.  You should assume the examiner of this report has \textbf{not} seen your project before.   
+Proportional-integral-derivative (PID) control is the most commonly used control algorithm in the industry and has become universally accepted in industrial control. \cite{picard2006toward} For autonomous robotic systems that can travel, PID control is an important aspect as it provides smoother control of the robot's motion, this will be achieved at two levels within the system: effective control of wheel speed and effective control of the robot's steering. In both cases, we want the robot to move smoothly rather than make sudden or large changes. PID control uses a continuous function to calculate the motor speed, so it is possible to respond to the motor at a fixed refresh rate (using micros) to smoothly control the speed of both wheels. It is noted that different refresh frequencies have a significant impact on the performance of the PID controller and if an optimum frequency domain is found to improve the PID performance, this will provide a good reference for future commissioning of other control systems to obtain the best response.
 
-For example, you may need to explain how a sensor works, including the advantages and disadvantages, in order for your reader to properly understand the \emph{value} of your investigation.  You want your reader to agree that this is an interesting project, as well as for your reader to understand \emph{why}. 
-
-You are encouraged to use specialist language and concepts covered in the unit to explain the background context of your project.  Where relevant, you are encouraged to reference external sources of information, such as technical datasheets, online articles\cite{picard2001toward}\cite{beck2010towards}, or academic literature.  Try to write your report both to explain it well and to demonstrate what you have learnt.
+A plot of PID performance versus settling time is shown in Figure 1. The overshoot is the amount by which the process variable exceeds the final value, and the stabilisation time is the time it takes for the process variable to stabilise to a certain percentage of the final value (typically 5\% is used). The steady-state error is the final difference between the process variable and the set point. \cite{picard2022toward}It is important to choose one or more of these variables to define the performance of the system, which shows whether the controller system can still meet the requirements for smooth robot operation in the worst case of one independent variable, the PID performance. We use overshoot and stabilisation time to measure the performance of the PID controller. Keeping the overshoot within a certain range for different update frequencies and a shorter stabilisation time will indicate higher  performance. More details on PID performance are described in subsequent sections.
+% 插入系统框图
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.6\linewidth]{Report/Pic/PID.png}}
+\caption{PID performance versus settling time.}
+\label{fig1}
+\end{figure}
 
 \subsection{Hypothesis Statement}
 
-Because formulating a hypothesis is central to this assessment, it is recommended you write your hypothesis into a clear subsection (this subsection) as specified in this report template.  Because you have introduced your work well above (providing key background context and specialist knowledge) you can be quite literal here with your hypothesis.  For example: 
+An experiment will be designed to find the link between the refresh frequency and the performance of a PID. Although the integral control will filter out higher frequency sensor noise, it is slower to respond to current errors\cite{picard2006toward}, so we assume that:
 
-Because the VL1680X has been identified as an active sensor with ... limitations, we hypothesise that:
-\begin{quote}
-    by applying ... filtering to the sensor, we predict a measurable improvement of the sensor under ... conditions.  
-\end{quote}
+\begin{itemize}
+\item A high update frequency makes changes in the PID controller control quantity not reflected in the controlled object promptly and reduces performance.
+\item A low update frequency results in a low response that does not achieve the control objective promptly and degrades the performance.
+\end{itemize}
 
-We investigate this hypothesis through a structured experiment on the Pololu 3Pi+ mobile robot, comparing the performance of the sensor with and without our technique.  
+
+We aim to find the optimum update frequency to exploit the performance of the PID, so we also assume that:
+
+\begin{itemize}
+\item There should be an optimal frequency band in the frequency domain that better balances all aspects of the PID and achieves better performance.  
+\end{itemize}
 
 \section{Implementation}
 % 2.

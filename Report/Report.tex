@@ -39,22 +39,25 @@ It is normal to write the abstract last.  First, try to concisely state the prob
 
 
 \section{Introduction}
-Use the introduction to explain your project (problem/question/challenge) to the reader.  To do this well, you will need to provide some background context.  It can be useful to imagine you are writing for someone who would be able to understand your work, but who is not familiar with it.  You should assume the examiner of this report has \textbf{not} seen your project before.   
 
-For example, you may need to explain how a sensor works, including the advantages and disadvantages, in order for your reader to properly understand the \emph{value} of your investigation.  You want your reader to agree that this is an interesting project, as well as for your reader to understand \emph{why}. 
+Proportional-integral-derivative (PID) control is the most commonly used control algorithm in the industry and has become universally accepted in industrial control. [1] For autonomous robotic systems that can travel, PID control is an important aspect as it provides smoother control of the robot's motion, this will be achieved at two levels within the system: effective control of wheel speed and effective control of the robot's steering. In both cases, we want the robot to move smoothly rather than make sudden or large changes. PID control uses a continuous function to calculate the motor speed, so it is possible to respond to the motor at a fixed refresh rate (using micros) to smoothly control the speed of both wheels. It is noted that different refresh frequencies have a significant impact on the performance of the PID controller and if an optimum frequency domain is found to improve the PID performance, this will provide a good reference for future commissioning of other control systems to obtain the best response.
 
-You are encouraged to use specialist language and concepts covered in the unit to explain the background context of your project.  Where relevant, you are encouraged to reference external sources of information, such as technical datasheets, online articles\cite{picard2001toward}\cite{beck2010towards}, or academic literature.  Try to write your report both to explain it well and to demonstrate what you have learnt.
-
+A plot of PID performance versus regulation time is shown in Figure 1. The overshoot is the amount by which the process variable exceeds the final value, and the stabilisation time is the time it takes for the process variable to stabilise to a certain percentage of the final value (typically 5\% is used). The steady-state error is the final difference between the process variable and the set point. [2] It is important to choose one or more of these variables to define the performance of the system, which shows whether the controller system can still meet the requirements for smooth robot operation in the worst case of one independent variable, the PID performance. We use overshoot and stabilisation time to measure the performance of the PID controller. Keeping the overshoot within a certain range for different update frequencies and a shorter stabilisation time will indicate higher  performance. More details on PID performance are described in subsequent sections.
 \subsection{Hypothesis Statement}
 
-Because formulating a hypothesis is central to this assessment, it is recommended you write your hypothesis into a clear subsection (this subsection) as specified in this report template.  Because you have introduced your work well above (providing key background context and specialist knowledge) you can be quite literal here with your hypothesis.  For example: 
+An experiment will be designed to find the link between the refresh frequency and the performance of a PID. Since sensor detection speed is limited by hardware such as wires and motor performance, the response speed will be limited, so we assume that:
 
-Because the VL1680X has been identified as an active sensor with ... limitations, we hypothesise that:
-\begin{quote}
-    by applying ... filtering to the sensor, we predict a measurable improvement of the sensor under ... conditions.  
-\end{quote}
+\begin{itemize}
+\item A high refresh frequency makes changes in the PID controller control quantity not reflected in the controlled object promptly and reduces performance.
+\end{itemize}
 
-We investigate this hypothesis through a structured experiment on the Pololu 3Pi+ mobile robot, comparing the performance of the sensor with and without our technique.  
+
+We aim to find the optimum update frequency to exploit the performance of the PID, so we also assume that:
+
+\begin{itemize}
+\item A low update frequency results in a low response that does not achieve the control objective promptly and degrades the performance.
+\item There should be an optimal frequency band in the frequency domain that better balances all aspects of the PID and achieves better performance.  
+\end{itemize}
 
 \section{Implementation}
 % 2.
@@ -73,9 +76,9 @@ In this paper we have measured the performance of the PID controller with the Po
 \end{figure}
 
 % 系统主要有5个组成部分：PID控制器，Motor Driver，Wheel，Encoder， Kinematics
-System has 4 main components: PID controller, Motor Driver, Wheel, Encoder, Kinematics. They are structured as shown in Fig. \ref{fig1}. 
+System has 4 main components: PID controller, Motor Driver, Wheel, Encoder, Kinematics.
 \begin{itemize}
-    \item\textbf{PID Controller: } We use a basic PID controller in our system to minimise the number of irrelevant variables. We do not want popular improvements to the PID to become variables in the system, such as integral limitation. The PID controller we use can be described as below:
+    \item\textbf{PID Controller: }We use basic PID controller in our system to minimize the number of irrelevant variables. We don't want common improvements for PID to be variables in the system, like integration limitation, etc. The PID controller we use can be described as below:
     
     
         \begin{equation}\label{PID_1}
@@ -89,13 +92,10 @@ System has 4 main components: PID controller, Motor Driver, Wheel, Encoder, Kine
         \end{equation}
         $u(t)$:PID controller output
         \par
-    \item\textbf{Wheel and Motor Driver: }For Pololu 3pi+ 32U4 robot, user could control the motor speed by controlling motor PWM duty cycle ratio. Motor takes 0$\sim$255(integer) as input and output 0$\sim$5V power to the motor.
-    %插入电机速度与输入的特性图 %
-    % 也就意味着速度计算有一些误差（难以测得一圈的编码数），但速度误差对本文中的实验没有影响。
-    \item\textbf{Encoder: }Each wheel shaft has an encoder that can be used to measure the movement of the wheel. Encoder counts between 358$\sim$359 for a 360° wheel spin. It also means that there is some error in the velocity calculations (it is difficult to measure the exact code count of one lap), but the velocity error has no effect on the experiments in this paper.
-    % 用编码器值的变化与轮子的周长计算轮子的运动，藉此计算机器人kinematics。在本文中只需计算运动学中的轮子速度部分。
-    \item\textbf{Kinematics: }The motion of the wheel is calculated using the variation of the encoder value with the circumference of the wheel in order to calculate the robot kinematics. in this paper only the wheel speed part of the kinematics is needed.
-
+    \item\textbf{Wheel and Motor Driver: }For Pololu 3pi+ 32U4 robot, user could control the motor speed by controlling motor PWM duty cycle ratio. Motor takes 0~255(integer) as input and output 0~5V power to the motor.
+    %插入电机速度与输入的特性图 
+    \item\textbf{Encoder: }On each wheel shaft we have a incremental encoder, with that we could measure wheel movements. Encoder counts between 358~359 for a 360° wheel spin
+    \item\textbf{Kinematics: }
 \end{itemize}
 
 
@@ -112,6 +112,14 @@ System has 4 main components: PID controller, Motor Driver, Wheel, Encoder, Kine
 		\EndFor
 	\end{algorithmic} 
 \end{algorithm}
+
+% 你要是能在这块放一个伪代码流程，效果会比较不错,你可能还可以在这里放一点等式
+It can be a good idea to include pseudo code (see Algorithm \ref{pseudo:ppo} above), and you may also want to include equations such as eq.\ref{eq:emc2} below:
+
+% 公式
+\begin{equation}\label{eq:emc2}
+E=mc^2
+\end{equation}
 
 \section{Experiment Methodology}
 % 3.
@@ -167,6 +175,12 @@ You should use subsections where they aid in clarity.  For instance, it may be u
 
 When presenting results, aim for a presentation which clearly communicates an insight. For example, a large table of all the individual data requires the reader to do a lot of work to find out what is important.  In contrast, a table which appropriately presents the mean and standard deviation has summarised the results for the reader (and would be more useful).  Similarly, aim to combine data onto a chart when possible so that a direct comparison can be made - and when possible, include error bars.  
 
+% 使用图片的语法的例子：
+\begin{figure}[htbp]
+\centerline{\includegraphics{fig1.png}}
+\caption{Example of a figure caption.  This dot may or may not be circular.}
+\label{fig1}
+\end{figure}
 
 % 记住标明所有的轴线，给所有的图表、数字和表格加上标题，并在报告文本中引用这些内容（例如，见图ref{fig1}）
 % --永远不要要求读者必须自己得出结论或理解，解释他们正在看什么。  

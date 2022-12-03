@@ -22,6 +22,7 @@
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{bm}
+\usepackage{url}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125em}}
 \begin{document}
@@ -42,22 +43,30 @@ It is normal to write the abstract last.  First, try to concisely state the prob
 
 
 \section{Introduction}
-Use the introduction to explain your project (problem/question/challenge) to the reader.  To do this well, you will need to provide some background context.  It can be useful to imagine you are writing for someone who would be able to understand your work, but who is not familiar with it.  You should assume the examiner of this report has \textbf{not} seen your project before.   
+Proportional-integral-derivative (PID) control is the most commonly used control algorithm in the industry and has become universally accepted in industrial control. \cite{knospe2006pid} For autonomous robotic systems that can travel, PID control is an important aspect as it provides smoother control of the robot's motion, this will be achieved at two levels within the system: effective control of wheel speed and effective control of the robot's steering. In both cases, we want the robot to move smoothly rather than make sudden or large changes. PID control uses a continuous function to calculate the motor speed, so it is possible to respond to the motor at a fixed refresh rate (using micros) to smoothly control the speed of both wheels. It is noted that different refresh frequencies have a significant impact on the performance of the PID controller and if an optimum frequency domain is found to improve the PID performance, this will provide a good reference for future commissioning of other control systems to obtain the best response.
 
-For example, you may need to explain how a sensor works, including the advantages and disadvantages, in order for your reader to properly understand the \emph{value} of your investigation.  You want your reader to agree that this is an interesting project, as well as for your reader to understand \emph{why}. 
-
-You are encouraged to use specialist language and concepts covered in the unit to explain the background context of your project.  Where relevant, you are encouraged to reference external sources of information, such as technical datasheets, online articles\cite{picard2001toward}\cite{beck2010towards}, or academic literature.  Try to write your report both to explain it well and to demonstrate what you have learnt.
-
+A plot of PID performance versus regulation time is shown in Figure 1. The overshoot is the amount by which the process variable exceeds the final value, and the stabilisation time is the time it takes for the process variable to stabilise to a certain percentage of the final value (typically 5\% is used). The steady-state error is the final difference between the process variable and the set point. \cite{Anonymous2022}It is important to choose one or more of these variables to define the performance of the system, which shows whether the controller system can still meet the requirements for smooth robot operation in the worst case of one independent variable, the PID performance. We use overshoot and stabilisation time to measure the performance of the PID controller. Keeping the overshoot within a certain range for different update frequencies and a shorter stabilisation time will indicate higher  performance. More details on PID performance are described in subsequent sections.
 \subsection{Hypothesis Statement}
+% 插入PID与调节时间插图
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.6\linewidth]{Report/Pic/PIDandSettlingTime.png}}
+\caption{PID and Settling Time diagram.}
+\label{PIDandSettlingTime}
+\end{figure}
 
-Because formulating a hypothesis is central to this assessment, it is recommended you write your hypothesis into a clear subsection (this subsection) as specified in this report template.  Because you have introduced your work well above (providing key background context and specialist knowledge) you can be quite literal here with your hypothesis.  For example: 
+An experiment will be designed to find the link between the refresh frequency and the performance of a PID. Although the integral control will filter out higher frequency sensor noise, it is slower to respond to current errors\cite{knospe2006pid}, so we assume that:
 
-Because the VL1680X has been identified as an active sensor with ... limitations, we hypothesise that:
-\begin{quote}
-    by applying ... filtering to the sensor, we predict a measurable improvement of the sensor under ... conditions.  
-\end{quote}
+\begin{itemize}
+\item A high update frequency makes changes in the PID controller control quantity not reflected in the controlled object promptly and reduces performance.
+\item A low update frequency results in a low response that does not achieve the control objective promptly and degrades the performance.
+\end{itemize}
 
-We investigate this hypothesis through a structured experiment on the Pololu 3Pi+ mobile robot, comparing the performance of the sensor with and without our technique.  
+
+We aim to find the optimum update frequency to exploit the performance of the PID, so we also assume that:
+
+\begin{itemize}
+\item There should be an optimal frequency band in the frequency domain that better balances all aspects of the PID and achieves better performance.  
+\end{itemize}
 
 \section{Implementation}
 % 2.
@@ -227,34 +236,20 @@ For a discrete controller, it may be unfair to use setting times (ms) to evaluat
 % 实验的总体结果详见附录中的的图（引用）。根据PID控制器性能的变化，我们将完整的频率范围分为三个频段：低频（0，40），中频（40，230），高频（230，500）。接下来展示PID控制器的性能在这三个频段中发生的变化。
 The overall results of the experiment are detailed in the figure in the appendix (Fig. \ref{fig_appendix}.). \textbf{The complete frequency range was divided into three bands according to the variation in the performance of the PID controller: low frequency \bm{$f=[0,40]$}, medium frequency \bm{$f=[40,230]$} and high frequency \bm{$f=[230,500]$}}. The next subsection shows how the performance of the PID controller changes over these three frequency bands.
 \subsection{Result Details}
-Graph explanation: Each line in the graph represents a neighbourhood with its corresponding PID parameter set to show the PID performance at different frequencies. The red dot at the bottom represents where the process value oscillates and fails to reach steady-state. Labels show the center frequencies of each neighbourhood.
-% 图中的每条线代表一个邻域与其对应的PID参数在不同频率下展现的PID性能。底部的红点代表在此处被控量震荡而不能达到稳态。
+Graph explanation: 
 \begin{itemize}
     \item \textbf{Low Frequency(\bm{$f=[0,40]$}):}
         \begin{figure}[htbp]
         \centerline{\includegraphics[width=\linewidth]{Report/Pic/ResultLowFrequency.png}}
         \caption{Low update frequency PID performance.}
-        \label{fig_LowFrequency}
+        \label{fig_FrequencyRange}
         \end{figure}
         %超调和调节时间最大。其中，调节时间明显比其他频段更长。随着频率上升，系统的调节时间和超调展现出逐渐减小的趋势。图右侧的四个红点是2邻域最右侧点发生震荡，左侧的两个红点是37.57邻域的最左侧两个点发生震荡。 
-        \\Overshoot and setting times are the largest. \textbf{The setting time is significantly longer than in the other frequency bands. As the frequency increases, the setting time and overshoot of the system show a decreasing trend.} The four red dots on the right side of the graph are the rightmost points of the $f=2$ neighbourhood where oscillation occurs, and the two red dots on the left side are the leftmost two points of the $f=37.57$ neighbourhood where oscillation occurs. 
+        Overshoot and setting times are the largest. \textbf{The setting time is significantly longer than in the other frequency bands. As the frequency increases, the setting time and overshoot of the system show a decreasing trend.} The four red dots on the right side of the graph are the rightmost points of the $f=2$ neighbourhood where oscillation occurs, and the two red dots on the left side are the leftmost two points of the $f=37.57$ neighbourhood where oscillation occurs. 
     \item \textbf{Medium Frequency(\bm{$f=[40,230]$}):} 
-        %PID控制器在此频段中性能最好。有最低的超调和调节时间。性能仍然随频率上升而改善。注意，随着频率上升，开始出现一些离散的易震荡频段，在这些频段中PID控制器突然变得非常容易震荡。这样的易震荡频段随频率上升而增多。图中所有的离群点都是位于震荡频段边缘的点。
-        \\The PID controller has the best performance in this frequency band. There is the lowest overshoot and setting time. Performance still improves with increasing frequency. Note that as frequency rises, some discrete oscillation-prone bands begin to appear where the PID controller suddenly becomes very oscillatory. Such oscillation-prone bands increase with increasing frequency. All the outliers in the graph are points at the edges of the oscillatory bands.
-        \begin{figure}
-            \centering
-            \includegraphics[width=1.2\linewidth]{Report/Pic/ResultMediumFrequency.png}
-            \caption{Medium update frequency PID performance.}
-            \label{fig_MediumFrequency}
-        \end{figure}
-    \item \textbf{High Frequency(\bm{$f=[230,500]$}):}\\
-        \begin{figure}
-            \centering
-            \includegraphics[width=1.2\linewidth]{Report/Pic/ResultMediumFrequency.png}
-            \caption{Medium update frequency PID performance.}
-            \label{fig_MediumFrequency}
-        \end{figure}
-        
+        %PID控制器在此频段中性能最好。有最低的超调和调节时间。
+    \item \textbf{High Frequency(\bm{$f=[230,500]$}):}
+        111
 \end{itemize}
 \subsection{Summary}
 
